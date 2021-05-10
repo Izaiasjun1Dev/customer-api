@@ -1,0 +1,1 @@
+# Basic example of apis construction via express functions and lambdas functions where data persistence was done through mongodb and dynamodb
