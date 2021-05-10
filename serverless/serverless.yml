@@ -1,0 +1,81 @@
+service: customer-api
+plugins:
+  - serverless-offline
+useDotenv: true
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+  stage: dev
+  region: us-east-1
+  iam:
+    role:
+      statements: 
+        - Effect: Allow
+          Action: 
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: arn:aws:dynamodb:us-east-1:267854546980:table/CUSTOMER
+
+  
+functions:
+  list:
+    handler: api/list.listcustomer
+    events: 
+     - http: 
+        path: customer
+        method: get 
+        cors: true
+
+  getcustomer:
+    handler: src/api/get.getcustomer
+    events: 
+     - http: 
+        path: src/customer/{customerId}
+        method: get 
+        cors: true
+
+  create:
+    handler: src/api/create.create
+    events: 
+     - http: 
+        path: customer
+        method: post 
+        cors: true
+  
+  login:
+    handler: src/api/login.login
+    events: 
+     - http: 
+        path: login
+        method: post 
+        cors: true
+
+resources: 
+  Resources: 
+    customerTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: CUSTOMERDB
+        AttributeDefinitions:
+          - AttributeName: customer_id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: customer_id
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
